@@ -1,0 +1,43 @@
+# ./bin/pairagon parameters/pairagon.zhmm ./examples/cdnatest1.fa ./examples/genomictest1.fa --splice_mode=cdna -o -i
+# Date: Sat Apr  6 21:30:23 2024
+# Pairagon version 1.1 build 20090501
+# PairHMM Parameters: parameters/pairagon.zhmm
+# Spliced alignment without quality value for cDNA
+# Genomic Sequence: >BC000006 165797639 - 165842657 chr1, 45018bp
+# cDNA    Sequence: >BC000006 clone_id 99198 trimversion 12, 1208bp
+# Note Best alignment is between forward est and forward genome, and splice sites imply forward gene
+# Completed in 206.00 CPU seconds
+# Optimal score: 23163.190974
+RGenomic1   	        -145	0.0	         -48	       10000	            BC000006	         -48	           0	            BC000006	+
+Match       	        3639	100.0	       10001	       10183	            BC000006	           1	         183	            BC000006	+
+DonorU2     	          92	0.0	       10184	       10191	            BC000006	            	            	                    	+
+IntronU2    	        -135	0.0	       10192	       14604	            BC000006	            	            	                    	+
+BranchU2    	           0	0.0	       14605	       14612	            BC000006	            	            	                    	+
+BrAccU2     	         -13	0.0	       14613	       14620	            BC000006	            	            	                    	+
+AccU2       	          73	0.0	       14621	       14626	            BC000006	            	            	                    	+
+Match       	        2451	100.0	       14627	       14755	            BC000006	         184	         312	            BC000006	+
+DonorU2     	          35	0.0	       14756	       14763	            BC000006	            	            	                    	+
+IntronU2    	        -159	0.0	       14764	       28118	            BC000006	            	            	                    	+
+BranchU2    	           0	0.0	       28119	       28126	            BC000006	            	            	                    	+
+BrAccU2     	         -13	0.0	       28127	       28134	            BC000006	            	            	                    	+
+AccU2       	          34	0.0	       28135	       28140	            BC000006	            	            	                    	+
+Match       	        2949	100.0	       28141	       28296	            BC000006	         313	         468	            BC000006	+
+DonorU2     	          92	0.0	       28297	       28304	            BC000006	            	            	                    	+
+IntronU2    	        -128	0.0	       28305	       30458	            BC000006	            	            	                    	+
+BranchU2    	           0	0.0	       30459	       30466	            BC000006	            	            	                    	+
+BrAccU2     	         -13	0.0	       30467	       30474	            BC000006	            	            	                    	+
+AccU2       	          56	0.0	       30475	       30480	            BC000006	            	            	                    	+
+Match       	        3529	100.0	       30481	       30665	            BC000006	         469	         653	            BC000006	+
+DonorU2     	          18	0.0	       30666	       30673	            BC000006	            	            	                    	+
+IntronU2    	        -130	0.0	       30674	       33244	            BC000006	            	            	                    	+
+BranchU2    	           0	0.0	       33245	       33252	            BC000006	            	            	                    	+
+BrAccU2     	         -13	0.0	       33253	       33260	            BC000006	            	            	                    	+
+AccU2       	          56	0.0	       33261	       33266	            BC000006	            	            	                    	+
+Match       	        1515	100.0	       33267	       33347	            BC000006	         654	         734	            BC000006	+
+DonorU2     	          45	0.0	       33348	       33355	            BC000006	            	            	                    	+
+IntronU2    	        -126	0.0	       33356	       34526	            BC000006	            	            	                    	+
+BranchU2    	           0	0.0	       34527	       34534	            BC000006	            	            	                    	+
+BrAccU2     	         -13	0.0	       34535	       34542	            BC000006	            	            	                    	+
+AccU2       	          72	0.0	       34543	       34548	            BC000006	            	            	                    	+
+Match       	        9057	100.0	       34549	       35022	            BC000006	         735	        1208	            BC000006	+
+RGenomic2   	        -145	0.0	       35023	       45018	            BC000006	            	            	                    	+
