@@ -1,0 +1,287 @@
+===========================================================
+PAIRAGON - A PairHMM Based cDNA to Genome Alignment Program
+===========================================================
+
+version 1.1
+
+# Table of Contents
+
+1. INTRODUCTION
+2. RUNNING PAIRAGON
+   2.1 Required Software
+   2.2 Required Components
+   2.3 Running the Program
+3. OUTPUT FORMATS
+4. VERSION HISTORY
+5. REFERENCES
+
+6. # INTRODUCTION
+
+Pairagon is a pair-HMM based cDNA to genome alignment program.
+It is written in C using the Twinscan/Pairagon libraries from
+the Center for Genome Sciences, Washington University.
+
+Included in this package are the source for the main alignment
+program, a helper script for running Pairagon and a script and
+library for converting between multiple alignment formats.
+
+For more information on Pairagon, see our paper in Bioinformatics.
+
+There are two modes of aligning two sequences using Pairagon:
+a) optimal Viterbi decoding, which guarantees optimal alignment
+subject to the given alignment scoring scheme, and
+b) Stepping Stone Viterbi decoding (Meyer and Durbin, 2002)
+that saves space and time by compromising on the optimality
+guarantee.
+
+There are also two different implementations of the Viterbi
+algorithm:
+a) standard Viterbi algorithm (that is faster, but uses more
+memory)
+b) Treeterbi algorithm that uses a tree structure to store
+the Viterbi variables thereby decreasing the memory
+requirements (500MB has been the maximum in our experience)
+
+2. # RUNNING PAIRAGON
+
+## 2.1 Required Software
+
+2.1.1 Seed alignment programs
+
+Running Pairagon using the Stepping Stone algorithm needs a seed
+alignment program to generate the Stepping Stone regions of the
+alignment. In practice, we have found that GMap works quite well.
+You can also use any other program with a format supported by the
+Alignment package.
+
+2.1.2 Perl
+
+Perl is required for the driver script. You also need to have
+your perl library path set to include the folder where Alignment.pm
+is installed.
+
+2.1.3 GLIB2.0 (Recommended)
+
+We highly recommend that you install glib2.0 library. The faster
+version of Pairagon (invoked using --unopt by the runPairagon.pl
+driver script -- see below) uses an efficient memory allocator
+from glib2.0. The default version does not need that. The included
+Makefile assumes that glib2.0 is installed for linux boxes and that
+it is not installed for other architectures. If you do not
+want to install glib2.0 on your linux box, or if you have glib2.0
+on a non-linux box, you will have to modify the Makefile.
+
+## 2.2 Required Components
+
+(1) Pairagon executable
+(2) Pairagon HMM parameter file
+(3) cDNA sequence
+(4) genomic sequence
+(5) seed alignment file for Stepping Stone (optional)
+
+(1) Pairagon executable
+
+To compile the source code into an executable, run the appropriate
+command for your operating system.
+
+linux:
+make pairagon-linux
+
+solaris:
+make pairagon-sparc
+(Choose your compiler and make sure that the right arguments
+are set for your compiler)
+
+Mac OS X:
+make pairagon-macosx
+(Choose your compiler and make sure that the right arguments
+are set for your compiler)
+
+After that, run the following command to make sure all of the
+pieces are linked properly.
+make install
+
+To install into a particular directory, use
+make DESTDIR=/some/dir install
+
+Pairagon has been tested on these three architectures. If you have a
+different architecture, you could still try to make the executable,
+however we do not guarantee you that Pairagon will compile and run on
+your architecture.
+
+(2) Pairagon HMM parameter file
+
+The HMM parameter file summarizes the pairHMM state model and the
+probabilities associated with it. Two parameter files have been included
+in this distribution under parameters directory:
+pairagon.zhmm - uses a position specific scoring matrix for donor
+and acceptor sites and models the branch sites in
+the U12 introns. These parameters were generated
+using a collection of Pairagon alignments of the
+human genome that had high sequence identity.
+
+pairagonx.zhmm - Similar to pairagon.zhmm, except was trained on
+a collection of high and low identity Pairagon
+alignments.
+
+See our paper for more details on how the parameters were generated.
+
+(3) Query/cDNA sequence
+
+The cDNA sequence should be in FASTA format
+
+(4) Target/genomic sequence
+
+The genomic sequence should be in FASTA format
+
+(5) seed alignment file for Stepping Stone (optional)
+
+File listing the seed alignment to be used by the Stepping Stone
+algorithm. The seed alignment file has the following the format:
+
+> header information (same as the cDNA Fasta file's header)
+> genomic_boundary_start=<number> genomic_boundary_end=<number> strand={+|-}
+> count=n
+> (g1b, c1b) (g1e, c1e)
+> (g2b, c2b) (g2e, c2e)
+> ...
+> (gnb, cnb) (gne, cne)
+
+The second line specifies the subsequence of the genomic sequence that
+you want to use. Since the time and space complexity of Pairagon is
+linear on the product of the sequence sizes, it helps to restrict the
+search space if it is possible. This line is the only one that is
+optional, and the absence of this line would result in the whole
+genomic sequence being used. The strand keyword tells Pairagon which
+orientation of the cDNA it should run. The cdna coordinates of the
+HSPs (see below) refer to this strand of the cDNA.
+
+The count=n line lists the number of HSPs in the seed alignment, and each line
+that follows lists the coordinates of the HSPs in the following format:
+(hsp_genomic_begin, hsp_cdna_begin) (hsp_genomic_end, hsp_cdna_end)
+
+It is important that the header information is the same as the header in
+the cDNA fasta file, since the program uses it to match the seed alignment to
+the right cDNA.
+
+## 2.3 Running the Program
+
+STAND-ALONE PAIRAGON:
+
+If you have all the files listed in the "Required Components" section,
+you can run pairagon in one of two ways:
+
+Faster version (uses approximately 297 MB on our linux box, might require
+several GBs depending on the input sequences)
+
+    bin/pairagon parameters/pairagon.zhmm examples/cdnatest1.fa examples/genomictest1.fa --seed=seed_file
+
+Treeterbi version (uses approximately 14 MB on our linux box, takes longer
+to finish. We haven't seen it use more than a 500 MB irrespective of the
+length of the input sequences)
+
+    bin/pairagon parameters/pairagon.zhmm examples/cdnatest1.fa examples/genomictest1.fa --seed=seed_file -o
+
+This will run Pairagon in two iterations, using the forward and reverse
+cDNA sequence assuming that the cDNA sequence is in the sense orientation. (wut) TODO:
+The highest scoring alignment
+among the two will be selected and reported. If you have prior
+knowledge about the orientation of the cDNA in the alignment and the
+orientation of introns in the genomic sequence, they can be specified by
+--alignment_mode and --splice_mode, respectively, and only those modes
+will be tested.
+
+USING THE PERL SCRIPT:
+
+We have included a script in the bin/ directory of the distribution,
+Pairagon.pl, which is a driver file for running Pairagon. The script
+makes a few assumptions:
+
+1.  The pairagon executable is in your PATH
+2.  $PAIRAGON_HOME has been exported as Pairagon's root directory
+    (i.e. the folder with a sub-folder called parameters that has
+    the parameter files in it)
+    [e.g. export PAIRAGON_HOME=/home/you/pairagon/]
+3.  Alignment.pm is in your PERL library PATH.
+
+Basic example (no seeding, output files go in output/, uses pairagon.zhmm):
+bin/Pairagon.pl -q examples/cdnatest1.fa -t examples/genomictest1.fa -o output/
+
+Cross species Alignment (uses pairagonx.zhmm):
+bin/Pairagon.pl -q examples/cdnatest1.fa -t examples/genomictest1.fa -o output/ -cross
+
+Generate a seed using GMap:
+bin/Pairagon.pl -q examples/cdnatest1.fa -t examples/genomictest1.fa -o output/ -a GMap
+
+Use the alignment seed.vulgar as the seed:
+bin/Pairagon.pl -q examples/cdnatest1.fa -t examples/genomictest1.fa -o output/ -a seed.vulgar
+
+Use the prefix `human` for generated files (i.e. human.pair, human.seed, etc.):
+bin/Pairagon.pl -q examples/cdnatest1.fa -t examples/genomictest1.fa -o output/ -p human
+
+3. # OUTPUT FORMATS
+   By default, Pairagon outputs a .pair file which includes the state sequence
+   of the Viterbi parse. You can use alignmentConvert.pl to convert it into other
+   common formats. Or you can use as many of the following options in the helper
+   script to convert automatically.
+
+3.1 GTF
+bin/Pairagon.pl -q examples/cdnatest1.fa -t examples/genomictest1.fa -o output/ -gtf
+[target id] Pairagon CDS 10000 10220 . + . gene_id "[query id]"; transcript_id "[query id]";
+
+3.2 GTF (with extra params)
+bin/Pairagon.pl -q examples/cdnatest1.fa -t examples/genomictest1.fa -o output/ -gtf -c chr2L -gid GENE5 -tid T2
+chr2L Pairagon CDS 10000 10220 . + . gene_id "GENE5"; transcript_id "T2";
+
+3.3 GFF
+bin/Pairagon.pl -q examples/cdnatest1.fa -t examples/genomictest1.fa -o output/ -gff
+[target id] ?? match_part 10001 10221 86.9 + . Parent=[query id];Target=[query id] 1 221;Gap=M221
+
+3.4 GFF (with extra params)
+bin/Pairagon.pl -q examples/cdnatest1.fa -t examples/genomictest1.fa -o output/ -gff -c chr2L -s Human
+chr2L HUMAN match_part 10001 10221 86.9 + . Parent=[query id];Target=[query id] 1 221;Gap=M221
+
+3.5 PSL
+bin/Pairagon.pl -q examples/cdnatest1.fa -t examples/genomictest1.fa -o output/ -psl
+194 49 0 0 0 0 1 911 + chr2L_CG10016RA 1208 0 243 chr2L 45018 10000 11154 2 221,22, 0,221,10000,11132,
+
+2.6 Vulgar
+bin/Pairagon.pl -q examples/cdnatest1.fa -t examples/genomictest1.fa -o output/ -vulgar
+vulgar: chr2L_CG10016RA 0 243 + chr2L 10000 11154 + 2975 M 221 221 5 0 2 I 0 907 3 0 2 M 22 22
+
+3.7 Alignment
+bin/Pairagon.pl -q examples/cdnatest1.fa -t examples/genomictest1.fa -o output/ -alignment
+ATGTTAGCCGTCATGCGAATCGATAACCATGACTGCAGGTCCGATTTCCGACGCAAGATG
+||||| || || ||||||||||| ||| |||||||| ||||||||||||| |||||||||
+ATGTTTGCTGTAATGCGAATCGACAACGATGACTGCCGGTCCGATTTCCGCCGCAAGATG
+...
+
+4. # VERSION HISTORY
+
+Pairagon 1.1: 1 May 2009
+New Parameter Files
+Bugfix
+Pairagon 1.01: 19 July 2007
+Release Update
+Bugfix
+Pairagon 1.0: 29 August 2006
+Release Update
+Pairagon 0.99 beta: 06 July 2006
+Model changes including branch points for U12 introns
+Pairagon 0.95 beta: 22 June 2006
+Added Treeterbi decoding
+Several memory and speed optimizations
+Pairagon 0.7 alpha: 12 January 2006
+Several speed optimizations; new parameter file
+Pairagon 0.5 alpha: 02 June 2005
+Alpha release made public.
+
+5. # REFERENCES
+   D.V. Lu, R.H. Brown, M. Arumugam, M.R. Brent. Pairagon: A Highly Accurate,
+   HMM-based cDNA-to-genome Aligner, Bioinformatics (2009)
+   A. Levine and R. Durbin. A computational scan for U12-dependent introns in the
+   human genome sequence, Nucleic Acids Research (2001) 29(19), 4006-4013
+   I.M. Meyer and R. Durbin. Comparative ab initio prediction of gene structures
+   using pair HMMs, Bioinformatics (2002) 18(10), 1309-1318
+   M. Zhang and W. Gish. Improved spliced alignment from an information theoretic
+   approach, Bioinformatics (2005) 22(1), 13-20
