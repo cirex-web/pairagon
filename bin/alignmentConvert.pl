@@ -1,7 +1,7 @@
 #!/usr/bin/perl
-
 use strict;
 use Getopt::Long;
+use lib 'lib/perl5';  # BRO SERIOUSLY WHY DID YOU PUT THIS LIBRARY HERE
 use Alignment;
 
 my ($infile, $intype, $outtype);

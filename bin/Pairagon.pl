@@ -1,5 +1,6 @@
 #! /usr/bin/perl -w
 
+# NOTE: you need to run this OUTSIDE ./bin dir in order for the library resolution of alignmentConvert.pl to work (yeah weird..)
 use strict;
 use Getopt::Long;
 
@@ -77,7 +78,7 @@ if($seed){
     $seedflag = "--seed=$seedfile";
 }
 
-my $paramfile = "parameterfs/";
+my $paramfile = "parameters/";
 if($cross){
     $paramfile .= "pairagonx.zhmm";
 }else{
